@@ -10,8 +10,8 @@ project:
   tiles: "1x1"
   top_module: "tt_um_mac_int8"
   source_files:
-    - "src/project.v"
-    - "src/mac_int8.v"
+    - "project.v"
+    - "mac_int8.v"
 
 pinout:
   ui[0]: "operand_a[0]"
