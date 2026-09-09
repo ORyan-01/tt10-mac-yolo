@@ -1,23 +1,46 @@
-`default_nettype none
+/*
+ * Modulo: mac_int8
+ * Descripcion: Unidad Multiply-Accumulate de 1 ciclo para inferencia INT8.
+ * Estandar: IEEE 1364-2005 (Verilog). Optimizado para Yosys/OpenLane.
+ *
+ * Sin cambios de logica respecto a tu version original: este archivo ya
+ * estaba correcto. El bug estaba en como project.v lo conectaba.
+ */
 
 module mac_int8 (
-    input  wire               clk,           
-    input  wire               rst_n,         
-    input  wire               valid_in,      
-    input  wire               accumulate_en, 
-    input  wire signed [7:0]  a_in,          
-    input  wire signed [7:0]  b_in,          
-    output reg                valid_out,     
-    output reg signed [31:0]  mac_out        
+    input  wire               clk,           // Reloj del sistema
+    input  wire               rst_n,         // Reset asincrono (activo en bajo)
+    input  wire               valid_in,      // Senal de control: Entradas validas
+    input  wire                accumulate_en, // 1: Acumula | 0: Carga solo multiplicacion
+    input  wire signed [7:0]  a_in,          // Operando A (INT8 con signo)
+    input  wire signed [7:0]  b_in,          // Operando B (INT8 con signo)
+    output reg                 valid_out,     // Indica que mac_out tiene dato valido
+    output reg  signed [31:0] mac_out        // Acumulador de 32 bits
 );
 
+    // ------------------------------------------------------------
+    // 1. SENALES INTERNAS
+    // ------------------------------------------------------------
+
+    // Multiplicacion de 8-bit x 8-bit con signo genera 16 bits
     wire signed [15:0] product;
-    wire signed [31:0] product_ext;
+
+    // Resultado intermedio antes de registrarse en el acumulador
     wire signed [31:0] next_mac;
 
-    assign product     = a_in * b_in;
-    assign product_ext = {{16{product[15]}}, product}; 
-    assign next_mac    = accumulate_en ? (mac_out + product_ext) : product_ext;
+    // ------------------------------------------------------------
+    // 2. LOGICA COMBINACIONAL (Aritmetica de sintesis)
+    // ------------------------------------------------------------
+
+    // Multiplicacion directa (Yosys la inferira como celdas aritmeticas optimizadas)
+    assign product = a_in * b_in;
+
+    // Multiplexion de acumulacion y extension de signo implicita ($signed)
+    assign next_mac = (accumulate_en) ? (mac_out + $signed(product)) : $signed(product);
+
+    // ------------------------------------------------------------
+    // 3. LOGICA SECUENCIAL (Flip-Flops)
+    // ------------------------------------------------------------
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -32,4 +55,5 @@ module mac_int8 (
             end
         end
     end
+
 endmodule
