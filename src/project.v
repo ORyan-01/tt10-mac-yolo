@@ -14,7 +14,7 @@ module tt_um_mac_int8 (
     wire signed [31:0] mac_result;
     wire               mac_valid;
 
-    // Instancia de tu función principal (intacta)
+    // Instanciación de tu función principal (intacta)
     mac_int8 u_mac (
         .clk            (clk),
         .rst_n          (rst_n),
@@ -26,7 +26,7 @@ module tt_um_mac_int8 (
         .mac_out        (mac_result)
     );
 
-    // Lógica de saturación para visión artificial (intacta)
+    // Lógica de saturación (intacta y con formato limpio)
     localparam signed [31:0] SAT_MAX = 32'sd127;
     localparam signed [31:0] SAT_MIN = -32'sd128;
 
@@ -35,14 +35,18 @@ module tt_um_mac_int8 (
                      (mac_result < SAT_MIN) ? SAT_MIN[7:0] :
                                               mac_result[7:0];
 
-    // Conexión al puerto de salida estándar
     assign uo_out = sat_out;
 
-    // Configuración de pines bidireccionales
+    // =======================================================
+    // FIX APLICADO AQUÍ: 
+    // Se elimina el always block y los registros (* keep *).
+    // La asignación directa a 0 le indica al flujo de OpenLane 
+    // que inserte celdas Tie-Low físicas en el Layout.
+    // =======================================================
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
-    // Sumidero para linter
+    // Sumidero de señales no utilizadas para evitar warnings de linter (intacto)
     wire _unused = &{ena, mac_valid, 1'b0};
 
 endmodule
