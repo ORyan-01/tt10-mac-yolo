@@ -1,5 +1,4 @@
 {
-  {
   "DESIGN_NAME": "tt_um_mac_int8",
   "VERILOG_FILES": "dir::project.v dir::mac_int8.v",
   "CLOCK_PORT": "clk",
