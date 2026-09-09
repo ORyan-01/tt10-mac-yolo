@@ -35,15 +35,14 @@ module tt_um_mac_int8 (
                      (mac_result < SAT_MIN) ? SAT_MIN[7:0] :
                                               mac_result[7:0];
 
-    // Conexión estándar al puerto físico del wrapper
+    // Conexión al puerto de salida estándar
     assign uo_out = sat_out;
 
-    // Asignación de pines bidireccionales como entradas puras (Tie-Low físico)
+    // Configuración de pines bidireccionales
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
-    // Sumidero para evitar advertencias del linter
+    // Sumidero para linter
     wire _unused = &{ena, mac_valid, 1'b0};
 
 endmodule
-
