@@ -13,11 +13,11 @@ In Edge AI applications, hardware offloading is critical. This module relieves t
 * **RTL Verification:** Exhaustive testbenches passing all corner cases (saturation, negative values, zero-multiplications).
 * **GDSII Ready:** The design successfully passes the physical flow, meeting all timing and area constraints for standard grid integrations.
 
-## 🛠️ Inputs and Outputs
-* `ui_in` [7:0]: 8-bit Input A (Weights / Activations)
-* `uio_in` [7:0]: 8-bit Input B (Weights / Activations)
-* `uo_out` [7:0]: Output (Lower 8 bits of Accumulator or multiplexed output)
-* `clk`: Clock signal
-* `rst_n`: Active-low reset
+## 🛠️ Inputs and Outputs (Tiny Tapeout Wrapper)
+* `ui_in` [7:0]: Operand A (`a_in`, signed 8-bit input for weights/activations).
+* `uio_in` [7:0]: Operand B (`b_in`, signed 8-bit input for weights/activations).
+* `uo_out` [7:0]: Saturated 8-bit output (`sat_out`, derived from the 32-bit accumulator `mac_result`).
+* `clk`: System clock.
+* `rst_n`: Active-low asynchronous reset.
 
 *(Note: Designed by Joaquín O'Ryan)*
