@@ -22,6 +22,6 @@
   "FP_PDN_MULTILAYER": 0,
   "RT_MAX_LAYER": "met4",
   "MAGIC_DEF_LABELS": 0,
-  "MAX_ROUTING_LAYER": "met4",
-  "DIE_AREA": "0 0 161.00 161.00"
+  "MAX_ROUTING_LAYER": "met4"
 }
+
