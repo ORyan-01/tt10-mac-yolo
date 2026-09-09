@@ -1,4 +1,4 @@
-# Tiny Tapeout project information
+yaml_version: 6
 project:
   title: "OptiMac"
   author: "Joaquín O'Ryan"
@@ -6,15 +6,11 @@ project:
   description: "MAC for hardware acceleration of small computer vision models"
   language: "Verilog"
   clock_hz: 0
-
   tiles: "1x1"
-
   top_module: "tt_um_mac_int8"
-
   source_files:
     - "project.v"
     - "mac_int8.v"
-
   pinout:
     ui[0]: ""
     ui[1]: ""
@@ -40,5 +36,3 @@ project:
     uio[5]: ""
     uio[6]: ""
     uio[7]: ""
-
-  yaml_version: 6
