@@ -1,20 +1,11 @@
-<!---
-
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
+---
+title: OptiMac
+author: Joaquín O'Ryan
+discord: oryan01.
+---
 
 ## How it works
-
-Explain how your project works
+Este diseño es un acelerador de hardware Multiply-Accumulate (MAC) de un ciclo optimizado para la inferencia de modelos pequeños de visión por computadora. Toma dos vectores de entrada de 8 bits con signo (`ui_in` y `uio_in`), los multiplica y acumula el resultado continuamente en un registro interno de 32 bits.
 
 ## How to test
-
-Explain how to use your project
-
-## External hardware
-
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+Aplica un ciclo de reset llevando `rst_n` a 0. Luego, en cada flanco positivo del reloj, entrega los operandos A y B. El registro interno acumulará los resultados y los emitirá a través de `uo_out`. La salida está equipada con una lógica combinacional que satura el resultado al rango de enteros de 8 bits con signo ([-128, 127]) para evitar desbordamientos desapercibidos en la lectura externa.
