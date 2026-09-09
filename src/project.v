@@ -35,9 +35,10 @@ module tt_um_mac_int8 (
 
     assign uo_out = sat_out;
 
-    // Registros intermedios para evitar que Yosys elimine los puertos físicos del LEF
-    reg [7:0] uio_out_reg;
-    reg [7:0] uio_oe_reg;
+    // Atributo (* keep *) indispensable para evitar que Yosys elimine 
+    // los puertos físicos de E/S bidireccionales del LEF y GDS.
+    (* keep *) reg [7:0] uio_out_reg;
+    (* keep *) reg [7:0] uio_oe_reg;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
