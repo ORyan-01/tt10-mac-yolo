@@ -1,10 +1,7 @@
-
-
-
 # INT8 MAC Accelerator for YOLO Edge Inference
 
 ## 📌 Overview
-This repository contains the RTL implementation of an 8-bit Multiply-Accumulate (MAC) unit designed as a hardware coprocessor for quantized neural networks, specifically targeting YOLO INT8 inference models. The design has been fully optimized and synthesized for physical fabrication via the Tiny Tapeout 10 (TT10) shuttle.
+This repository contains the RTL implementation of an 8-bit Multiply-Accumulate (MAC) unit designed as a hardware coprocessor for quantized neural networks, specifically targeting YOLO INT8 inference models. The design has been fully optimized and has successfully passed the OpenLane physical design flow, proving its readiness for ASIC fabrication through open-source shuttles like Tiny Tapeout.
 
 ## ⚙️ Architecture
 In Edge AI applications, hardware offloading is critical. This module relieves the main processor from heavy tensor math by executing convolutions in dedicated silicon.
@@ -14,7 +11,7 @@ In Edge AI applications, hardware offloading is critical. This module relieves t
 
 ## 🔬 Verification & Physical Flow
 * **RTL Verification:** Exhaustive testbenches passing all corner cases (saturation, negative values, zero-multiplications).
-* **GDSII Ready:** The design successfully passes the OpenLane physical design flow, meeting all timing and area constraints for the TT10 grid.
+* **GDSII Ready:** The design successfully passes the physical flow, meeting all timing and area constraints for standard grid integrations.
 
 ## 🛠️ Inputs and Outputs
 * `ui_in` [7:0]: 8-bit Input A (Weights / Activations)
