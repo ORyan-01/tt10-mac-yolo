@@ -17,8 +17,6 @@
   "LEFT_MARGIN_MULT": 6,
   "RIGHT_MARGIN_MULT": 6,
   "FP_SIZING": "absolute",
-  "FP_IO_HLENGTH": 1,
-  "FP_IO_VLENGTH": 1,
   "FP_PDN_VPITCH": 33.32,
   "RUN_CVC": 1,
   "FP_PDN_MULTILAYER": 0,
