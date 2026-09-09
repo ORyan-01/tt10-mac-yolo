@@ -5,13 +5,14 @@ project:
   author: "Joaquín O'Ryan"
   discord: "oryan01."
   description: "MAC for hardware acceleration of small computer vision models"
-  language: "Verilog"
-  clock_hz: 10000000
-  tiles: "1x1"
-  top_module: "tt_um_mac_int8"
-  source_files:
-    - "project.v"
-    - "mac_int8.v"
+
+language: "Verilog"
+clock_hz: 10000000
+tiles: "1x1"
+top_module: "tt_um_mac_int8"
+source_files:
+  - "project.v"
+  - "mac_int8.v"
 
 pinout:
   ui[0]: "operand_a[0]"
@@ -22,14 +23,14 @@ pinout:
   ui[5]: "operand_a[5]"
   ui[6]: "operand_a[6]"
   ui[7]: "operand_a[7]"
-  uo[0]: "mac_result[0]"
-  uo[1]: "mac_result[1]"
-  uo[2]: "mac_result[2]"
-  uo[3]: "mac_result[3]"
-  uo[4]: "mac_result[4]"
-  uo[5]: "mac_result[5]"
-  uo[6]: "mac_result[6]"
-  uo[7]: "mac_result[7]"
+  uo[0]: "uo_out[0]"
+  uo[1]: "uo_out[1]"
+  uo[2]: "uo_out[2]"
+  uo[3]: "uo_out[3]"
+  uo[4]: "uo_out[4]"
+  uo[5]: "uo_out[5]"
+  uo[6]: "uo_out[6]"
+  uo[7]: "uo_out[7]"
   uio[0]: "operand_b[0]"
   uio[1]: "operand_b[1]"
   uio[2]: "operand_b[2]"
