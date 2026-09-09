@@ -1,63 +1,65 @@
+
+ * Copyright (c) 2024 Joaquin O'Ryan
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 `default_nettype none
 
 module tt_um_mac_int8 (
-    input  wire [7:0] ui_in,    
-    output wire [7:0] uo_out,   
-    input  wire [7:0] uio_in,   
-    output wire [7:0] uio_out,  
-    output wire [7:0] uio_oe,   
-    input  wire       ena,      
-    input  wire       clk,      
-    input  wire       rst_n     
+    input  wire [7:0] ui_in,    // Dedicated inputs       -> operando A (int8, con signo)
+    output wire [7:0] uo_out,   // Dedicated outputs      -> resultado MAC, saturado a int8
+    input  wire [7:0] uio_in,   // IOs: Input path        -> operando B (int8, con signo)
+    output wire [7:0] uio_out,  // IOs: Output path       -> no usado
+    output wire [7:0] uio_oe,   // IOs: Enable path       -> no usado (todo como entrada)
+    input  wire        ena,      // always 1 when the design is powered, so you can ignore it
+    input  wire        clk,      // clock
+    input  wire        rst_n     // reset_n - low to reset
 );
 
-    // Decodificación de control desde uio_in
-    wire       valid_in      = uio_in[0];
-    wire       accumulate_en = uio_in[1];
-    wire       load_b        = uio_in[5];
-    wire [1:0] byte_sel      = uio_in[4:3];
-
-    reg signed [7:0] a_reg;
-    reg signed [7:0] b_reg;
-
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            a_reg <= 8'sd0;
-            b_reg <= 8'sd0;
-        end else if (ena) begin
-            if (!load_b) 
-                a_reg <= ui_in;
-            else         
-                b_reg <= ui_in;
-        end
-    end
-
-    wire valid_out_core;
+    // ------------------------------------------------------------------
+    // Nucleo MAC: acumulacion CONTINUA (accumulate_en=1, valid_in=1 fijos).
+    //
+    // rst_n cumple doble funcion: reset de encendido, y "iniciar nueva
+    // ventana de acumulacion". Para calcular un nuevo producto punto
+    // (siguiente ventana de convolucion / siguiente canal de salida):
+    //   1. Pulsa rst_n en bajo >=1 ciclo de reloj  -> mac_out vuelve a 0
+    //   2. Sube rst_n a alto
+    //   3. Alimenta un par (operando A, operando B) por cada ciclo de reloj
+    // ------------------------------------------------------------------
     wire signed [31:0] mac_result;
+    wire               mac_valid;
 
-    mac_int8 mac_core (
-        .clk(clk),
-        .rst_n(rst_n),
-        .valid_in(valid_in),
-        .accumulate_en(accumulate_en),
-        .a_in(a_reg),
-        .b_in(b_reg),
-        .valid_out(valid_out_core),
-        .mac_out(mac_result)
+    mac_int8 u_mac (
+        .clk           (clk),
+        .rst_n         (rst_n),
+        .valid_in      (1'b1),
+        .accumulate_en (1'b1),
+        .a_in          (ui_in),
+        .b_in          (uio_in),
+        .valid_out     (mac_valid),
+        .mac_out       (mac_result)
     );
 
-    // Multiplexor de salida: extrae el resultado de 32 bits en bloques de 8 bits
-    assign uo_out = (byte_sel == 2'b00) ? mac_result[7:0]   :
-                    (byte_sel == 2'b01) ? mac_result[15:8]  :
-                    (byte_sel == 2'b10) ? mac_result[23:16] :
-                                          mac_result[31:24];
+    // ------------------------------------------------------------------
+    // El acumulador es de 32 bits pero uo_out solo tiene 8 pines.
+    // En vez de truncar en crudo (lo que provocaba wraparound silencioso
+    // en la version anterior), saturamos al rango int8 [-128, 127].
+    // ------------------------------------------------------------------
+    localparam signed [31:0] SAT_MAX = 32'sd127;
+    localparam signed [31:0] SAT_MIN = -32'sd128;
 
-    // Configuración de puertos bidireccionales
-    assign uio_oe       = 8'b0000_0100; // uio[2] como salida para valid_out
-    assign uio_out[2]   = valid_out_core;
-    assign uio_out[7:3] = 5'b0;
-    assign uio_out[1:0] = 2'b0;
+    wire signed [7:0] sat_out;
+    assign sat_out = (mac_result > SAT_MAX) ? SAT_MAX[7:0] :
+                      (mac_result < SAT_MIN) ? SAT_MIN[7:0] :
+                                                mac_result[7:0];
 
-    wire _unused = &{ena, 1'b0};
+    assign uo_out = sat_out;
+
+    // Pines bidireccionales: no se usan, se dejan como entrada y en 0.
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
+
+    // Evita warnings de "senal no usada" en el linter (no afecta la logica).
+    wire _unused = &{ena, mac_valid, 1'b0};
 
 endmodule
