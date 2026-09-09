@@ -55,4 +55,3 @@ module tt_um_mac_int8 (
     wire _unused = &{ena, mac_valid, 1'b0};
 
 endmodule
-
