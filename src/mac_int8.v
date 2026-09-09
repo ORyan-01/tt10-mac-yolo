@@ -16,7 +16,6 @@ module mac_int8 (
     wire signed [31:0] next_mac;
 
     assign product     = a_in * b_in;
-    // Extensión de signo manual para evitar el fallo de Yosys
     assign product_ext = {{16{product[15]}}, product}; 
     assign next_mac    = accumulate_en ? (mac_out + product_ext) : product_ext;
 
