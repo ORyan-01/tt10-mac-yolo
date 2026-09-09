@@ -11,27 +11,53 @@ module tt_um_mac_int8 (
     input  wire       rst_n     
 );
 
-    // Pines bidireccionales forzados como entradas
-    assign uio_out = 8'b00000000;
-    assign uio_oe  = 8'b00000000;
+    // Decodificación de control desde uio_in
+    wire       valid_in      = uio_in[0];
+    wire       accumulate_en = uio_in[1];
+    wire       load_b        = uio_in[5];
+    wire [1:0] byte_sel      = uio_in[4:3];
 
-    wire signed [31:0] mac_out_full;
-    wire valid_out_signal;
+    reg signed [7:0] a_reg;
+    reg signed [7:0] b_reg;
 
-    mac_int8 u_mac (
-        .clk           (clk),
-        .rst_n         (rst_n),
-        .valid_in      (1'b1),
-        .accumulate_en (1'b0),
-        .a_in          (ui_in),
-        .b_in          (uio_in),
-        .valid_out     (valid_out_signal),
-        .mac_out       (mac_out_full)
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            a_reg <= 8'sd0;
+            b_reg <= 8'sd0;
+        end else if (ena) begin
+            if (!load_b) 
+                a_reg <= ui_in;
+            else         
+                b_reg <= ui_in;
+        end
+    end
+
+    wire valid_out_core;
+    wire signed [31:0] mac_result;
+
+    mac_int8 mac_core (
+        .clk(clk),
+        .rst_n(rst_n),
+        .valid_in(valid_in),
+        .accumulate_en(accumulate_en),
+        .a_in(a_reg),
+        .b_in(b_reg),
+        .valid_out(valid_out_core),
+        .mac_out(mac_result)
     );
 
-    assign uo_out = mac_out_full[7:0];
+    // Multiplexor de salida: extrae el resultado de 32 bits en bloques de 8 bits
+    assign uo_out = (byte_sel == 2'b00) ? mac_result[7:0]   :
+                    (byte_sel == 2'b01) ? mac_result[15:8]  :
+                    (byte_sel == 2'b10) ? mac_result[23:16] :
+                                          mac_result[31:24];
 
-    // Sumidero estándar para silenciar a Verilator
-    wire _unused = &{1'b0, ena, valid_out_signal, mac_out_full[31:8]};
+    // Configuración de puertos bidireccionales
+    assign uio_oe       = 8'b0000_0100; // uio[2] como salida para valid_out
+    assign uio_out[2]   = valid_out_core;
+    assign uio_out[7:3] = 5'b0;
+    assign uio_out[1:0] = 2'b0;
+
+    wire _unused = &{ena, 1'b0};
 
 endmodule
