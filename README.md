@@ -1,45 +1,26 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# ⚠️ This template is old and outdated ⚠️
 
-Please use **[ttsky-verilog-template](https://github.com/TinyTapeout/ttsky-verilog-template)** for new projects.
 
-# Tiny Tapeout Verilog Project Template
+# INT8 MAC Accelerator for YOLO Edge Inference
 
-- [Read the documentation for project](docs/info.md)
+## 📌 Overview
+This repository contains the RTL implementation of an 8-bit Multiply-Accumulate (MAC) unit designed as a hardware coprocessor for quantized neural networks, specifically targeting YOLO INT8 inference models. The design has been fully optimized and synthesized for physical fabrication via the Tiny Tapeout 10 (TT10) shuttle.
 
-## What is Tiny Tapeout?
+## ⚙️ Architecture
+In Edge AI applications, hardware offloading is critical. This module relieves the main processor from heavy tensor math by executing convolutions in dedicated silicon.
+* **Multiplier:** 8-bit x 8-bit (Signed).
+* **Accumulator:** 32-bit register to prevent overflow during deep convolutional layer operations.
+* **Precision:** INT8 (Industry standard for Edge AI, balancing area efficiency and inference accuracy).
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+## 🔬 Verification & Physical Flow
+* **RTL Verification:** Exhaustive testbenches passing all corner cases (saturation, negative values, zero-multiplications).
+* **GDSII Ready:** The design successfully passes the OpenLane physical design flow, meeting all timing and area constraints for the TT10 grid.
 
-To learn more and get started, visit https://tinytapeout.com.
+## 🛠️ Inputs and Outputs
+* `ui_in` [7:0]: 8-bit Input A (Weights / Activations)
+* `uio_in` [7:0]: 8-bit Input B (Weights / Activations)
+* `uo_out` [7:0]: Output (Lower 8 bits of Accumulator or multiplexed output)
+* `clk`: Clock signal
+* `rst_n`: Active-low reset
 
-## Set up your Verilog project
-
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
-
-The GitHub action will automatically build the ASIC files using [OpenLane](https://www.zerotoasiccourse.com/terminology/openlane/).
-
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
+*(Note: Designed by Joaquín O'Ryan)*
