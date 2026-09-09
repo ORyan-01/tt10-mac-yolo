@@ -2,7 +2,7 @@
 
 module tt_um_mac_int8 (
     input  wire [7:0] ui_in,
-    output wire [7:0] mac_result, // Alineado con el info.yaml para el Precheck
+    output wire [7:0] uo_out,
     input  wire [7:0] uio_in,
     output wire [7:0] uio_out,
     output wire [7:0] uio_oe,
@@ -11,7 +11,7 @@ module tt_um_mac_int8 (
     input  wire       rst_n
 );
 
-    wire signed [31:0] mac_result_internal;
+    wire signed [31:0] mac_result;
     wire               mac_valid;
 
     // Instancia de tu función principal (intacta)
@@ -23,7 +23,7 @@ module tt_um_mac_int8 (
         .a_in           (ui_in),
         .b_in           (uio_in),
         .valid_out      (mac_valid),
-        .mac_out        (mac_result_internal)
+        .mac_out        (mac_result)
     );
 
     // Lógica de saturación para visión artificial (intacta)
@@ -31,12 +31,12 @@ module tt_um_mac_int8 (
     localparam signed [31:0] SAT_MIN = -32'sd128;
 
     wire signed [7:0] sat_out;
-    assign sat_out = (mac_result_internal > SAT_MAX) ? SAT_MAX[7:0] :
-                     (mac_result_internal < SAT_MIN) ? SAT_MIN[7:0] :
-                                                       mac_result_internal[7:0];
+    assign sat_out = (mac_result > SAT_MAX) ? SAT_MAX[7:0] :
+                     (mac_result < SAT_MIN) ? SAT_MIN[7:0] :
+                                              mac_result[7:0];
 
-    // Conexión directa al bus de salida que espera el Precheck y tu info.yaml
-    assign mac_result = sat_out;
+    // Conexión estándar al puerto físico del wrapper
+    assign uo_out = sat_out;
 
     // Asignación de pines bidireccionales como entradas puras (Tie-Low físico)
     assign uio_out = 8'b0;
@@ -46,3 +46,4 @@ module tt_um_mac_int8 (
     wire _unused = &{ena, mac_valid, 1'b0};
 
 endmodule
+
